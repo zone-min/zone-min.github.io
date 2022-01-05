@@ -20,21 +20,19 @@
     var CONFIG = {"hostname":"zone-min.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="LINUX设备树语法详解概念Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;“目录内，比如exynos4412参考板的板级设备树文件就是”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;exynos4412-or">
+  <meta name="description" content="概念Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM-Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;“目录内，比如exynos4412参考板的板级设备树文件就是”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;exynos4412-origen.dts”。这个文">
 <meta property="og:type" content="article">
 <meta property="og:title" content="linux device driver">
 <meta property="og:url" content="http://zone-min.github.io/2022/01/04/linux-device-driver/index.html">
 <meta property="og:site_name" content="ZONE-MIN个人博客">
-<meta property="og:description" content="LINUX设备树语法详解概念Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;“目录内，比如exynos4412参考板的板级设备树文件就是”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;exynos4412-or">
+<meta property="og:description" content="概念Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM-Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;“目录内，比如exynos4412参考板的板级设备树文件就是”arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;exynos4412-origen.dts”。这个文">
 <meta property="og:locale">
-<meta property="og:image" content="http://zone-min.github.io/2022/01/04/linux-device-driver/xiao.jpg">
 <meta property="article:published_time" content="2022-01-04T06:23:15.000Z">
-<meta property="article:modified_time" content="2022-01-04T07:07:18.391Z">
+<meta property="article:modified_time" content="2022-01-04T14:58:30.553Z">
 <meta property="article:author" content="zone-min">
-<meta property="article:tag" content="LINUX">
 <meta property="article:tag" content="DRIVER">
+<meta property="article:tag" content="LINUX-5.04.70">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://zone-min.github.io/2022/01/04/linux-device-driver/xiao.jpg">
 
 <link rel="canonical" href="http://zone-min.github.io/2022/01/04/linux-device-driver/">
 
@@ -178,7 +176,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-01-04 14:23:15 / Modified: 15:07:18" itemprop="dateCreated datePublished" datetime="2022-01-04T14:23:15+08:00">2022-01-04</time>
+              <time title="Created: 2022-01-04 14:23:15 / Modified: 22:58:30" itemprop="dateCreated datePublished" datetime="2022-01-04T14:23:15+08:00">2022-01-04</time>
             </span>
 
           
@@ -192,9 +190,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img src="/2022/01/04/linux-device-driver/xiao.jpg" alt="q"></p>
-<h2 id="LINUX设备树语法详解"><a href="#LINUX设备树语法详解" class="headerlink" title="LINUX设备树语法详解"></a>LINUX设备树语法详解</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch/arm/boot/dts/“目录内，比如exynos4412参考板的板级设备树文件就是”arch/arm/boot/dts/exynos4412-origen.dts”。这个文件可以通过$make dtbs命令编译成二进制的.dtb文件供内核驱动使用。<br>基于同样的软件分层设计的思想，由于一个SoC可能对应多个machine，如果每个machine的设备树都写成一个完全独立的.dts文件，那么势必相当一些.dts文件有重复的部分，为了解决这个问题，Linux设备树目录把一个SOC公用的部分或者多个machine共同的部分提炼为相应的.dtsi文件。这样每个.dts就只有自己差异的部分，公有的部分只需要”include”相应的.dtsi文件, 这样就是整个设备树的管理更加有序。我这里用`Linux4.8.5源码自带的dm9000网卡为例来分析设备树的使用和移植。这个网卡的设备树节点信息在”Documentation/devicetree/bindings/net/davicom-dm9000.txt”有详细说明，其网卡驱动源码是”drivers/net/ethernet/davicom/dm9000.c”。</p>
+        <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM-Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch/arm/boot/dts/“目录内，比如exynos4412参考板的板级设备树文件就是”arch/arm/boot/dts/exynos4412-origen.dts”。这个文件可以通过$make dtbs命令编译成二进制的.dtb文件供内核驱动使用。基于同样的软件分层设计的思想，由于一个SoC可能对应多个machine，如果每个machine的设备树都写成一个完全独立的.dts文件，那么势必相当一些.dts文件有重复的部分，为了解决这个问题，Linux设备树目录把一个SOC公用的部分或者多个machine共同的部分提炼为相应的.dtsi文件。这样每个.dts就只有自己差异的部分，公有的部分只需要”include”相应的.dtsi文件, 这样就是整个设备树的管理更加有序。</p>
+<h2 id="LINUX-驱动开发之HELLO-WORLD！"><a href="#LINUX-驱动开发之HELLO-WORLD！" class="headerlink" title="LINUX 驱动开发之HELLO WORLD！"></a>LINUX 驱动开发之HELLO WORLD！</h2><p>hello.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 当驱动被加载的时候，执行此函数</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> __init <span class="title">hello_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    printk(KERN_ALERT <span class="string">&quot;welcome, hello\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 当驱动被卸载的时候，执行此函数</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> __exit <span class="title">hello_exit</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    printk(KERN_ALERT <span class="string">&quot;bye, hello\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 版权声明</span></span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下两个函数属于 Linux 的驱动框架，只要把驱动两个函数地址注册进去即可。</span></span><br><span class="line">module_init(hello_init);</span><br><span class="line">module_exit(hello_exit);</span><br></pre></td></tr></table></figure>
 
+<p>Makefile</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(KERNELRELEASE)</span>,)</span><br><span class="line">        obj-m := hello.o</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        KERNELDIR ?= /home/workspace/linux-5.4.70</span><br><span class="line">        PWD := <span class="variable">$(<span class="built_in">shell</span> pwd)</span></span><br><span class="line"><span class="section">default:</span></span><br><span class="line">        <span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNELDIR)</span> M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">        <span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNEL_PATH)</span> M=<span class="variable">$(PWD)</span> clean</span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+<h2 id="LINUX-驱动开发之SCULL"><a href="#LINUX-驱动开发之SCULL" class="headerlink" title="LINUX 驱动开发之SCULL"></a>LINUX 驱动开发之SCULL</h2>
     </div>
 
     
@@ -203,8 +205,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/LINUX/" rel="tag"># LINUX</a>
               <a href="/tags/DRIVER/" rel="tag"># DRIVER</a>
+              <a href="/tags/LINUX-5-04-70/" rel="tag"># LINUX-5.04.70</a>
           </div>
 
         
@@ -275,7 +277,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#LINUX%E8%AE%BE%E5%A4%87%E6%A0%91%E8%AF%AD%E6%B3%95%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">LINUX设备树语法详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">概念</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LINUX-%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E4%B9%8BHELLO-WORLD%EF%BC%81"><span class="nav-number">2.</span> <span class="nav-text">LINUX 驱动开发之HELLO WORLD！</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LINUX-%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E4%B9%8BSCULL"><span class="nav-number">3.</span> <span class="nav-text">LINUX 驱动开发之SCULL</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -298,7 +300,7 @@
         <span class="site-state-item-name">categories</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">tags</span>
       </div>
   </nav>

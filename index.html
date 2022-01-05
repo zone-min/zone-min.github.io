@@ -172,7 +172,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-01-04 14:23:15 / Modified: 15:07:18" itemprop="dateCreated datePublished" datetime="2022-01-04T14:23:15+08:00">2022-01-04</time>
+              <time title="Created: 2022-01-04 14:23:15 / Modified: 22:58:30" itemprop="dateCreated datePublished" datetime="2022-01-04T14:23:15+08:00">2022-01-04</time>
             </span>
 
           
@@ -186,9 +186,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><img src="/2022/01/04/linux-device-driver/xiao.jpg" alt="q"></p>
-<h2 id="LINUX设备树语法详解"><a href="#LINUX设备树语法详解" class="headerlink" title="LINUX设备树语法详解"></a>LINUX设备树语法详解</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch/arm/boot/dts/“目录内，比如exynos4412参考板的板级设备树文件就是”arch/arm/boot/dts/exynos4412-origen.dts”。这个文件可以通过$make dtbs命令编译成二进制的.dtb文件供内核驱动使用。<br>基于同样的软件分层设计的思想，由于一个SoC可能对应多个machine，如果每个machine的设备树都写成一个完全独立的.dts文件，那么势必相当一些.dts文件有重复的部分，为了解决这个问题，Linux设备树目录把一个SOC公用的部分或者多个machine共同的部分提炼为相应的.dtsi文件。这样每个.dts就只有自己差异的部分，公有的部分只需要”include”相应的.dtsi文件, 这样就是整个设备树的管理更加有序。我这里用`Linux4.8.5源码自带的dm9000网卡为例来分析设备树的使用和移植。这个网卡的设备树节点信息在”Documentation/devicetree/bindings/net/davicom-dm9000.txt”有详细说明，其网卡驱动源码是”drivers/net/ethernet/davicom/dm9000.c”。</p>
+          <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>Linux内核从3.x开始引入设备树的概念，用于实现驱动代码与设备信息相分离。如在ARM-Linux内，一个.dts(device tree source)文件对应一个ARM的machine，一般放置在内核的”arch/arm/boot/dts/“目录内，比如exynos4412参考板的板级设备树文件就是”arch/arm/boot/dts/exynos4412-origen.dts”。这个文件可以通过$make dtbs命令编译成二进制的.dtb文件供内核驱动使用。基于同样的软件分层设计的思想，由于一个SoC可能对应多个machine，如果每个machine的设备树都写成一个完全独立的.dts文件，那么势必相当一些.dts文件有重复的部分，为了解决这个问题，Linux设备树目录把一个SOC公用的部分或者多个machine共同的部分提炼为相应的.dtsi文件。这样每个.dts就只有自己差异的部分，公有的部分只需要”include”相应的.dtsi文件, 这样就是整个设备树的管理更加有序。</p>
+<h2 id="LINUX-驱动开发之HELLO-WORLD！"><a href="#LINUX-驱动开发之HELLO-WORLD！" class="headerlink" title="LINUX 驱动开发之HELLO WORLD！"></a>LINUX 驱动开发之HELLO WORLD！</h2><p>hello.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 当驱动被加载的时候，执行此函数</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> __init <span class="title">hello_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    printk(KERN_ALERT <span class="string">&quot;welcome, hello\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 当驱动被卸载的时候，执行此函数</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> __exit <span class="title">hello_exit</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    printk(KERN_ALERT <span class="string">&quot;bye, hello\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 版权声明</span></span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下两个函数属于 Linux 的驱动框架，只要把驱动两个函数地址注册进去即可。</span></span><br><span class="line">module_init(hello_init);</span><br><span class="line">module_exit(hello_exit);</span><br></pre></td></tr></table></figure>
 
+<p>Makefile</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ifneq</span> (<span class="variable">$(KERNELRELEASE)</span>,)</span><br><span class="line">        obj-m := hello.o</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        KERNELDIR ?= /home/workspace/linux-5.4.70</span><br><span class="line">        PWD := <span class="variable">$(<span class="built_in">shell</span> pwd)</span></span><br><span class="line"><span class="section">default:</span></span><br><span class="line">        <span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNELDIR)</span> M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">        <span class="variable">$(MAKE)</span> -C <span class="variable">$(KERNEL_PATH)</span> M=<span class="variable">$(PWD)</span> clean</span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+<h2 id="LINUX-驱动开发之SCULL"><a href="#LINUX-驱动开发之SCULL" class="headerlink" title="LINUX 驱动开发之SCULL"></a>LINUX 驱动开发之SCULL</h2>
       
     </div>
 
@@ -230,10 +234,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-12-20 15:19:45 / Modified: 16:27:47" itemprop="dateCreated datePublished" datetime="2021-12-20T15:19:45+08:00">2021-12-20</time>
+              <time title="Created: 2021-12-20 15:19:45" itemprop="dateCreated datePublished" datetime="2021-12-20T15:19:45+08:00">2021-12-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-01-04 22:48:42" itemprop="dateModified" datetime="2022-01-04T22:48:42+08:00">2022-01-04</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -255,8 +265,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><img src="/2021/12/20/xv6-RSCI-V%E5%B8%B8%E7%94%A8%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4/xiao.jpg" alt="q"></p>
-<h2 id="RISC-V-REGS"><a href="#RISC-V-REGS" class="headerlink" title="RISC-V REGS"></a>RISC-V REGS</h2><p><img src="/2021/12/20/xv6-RSCI-V%E5%B8%B8%E7%94%A8%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4/1.jpg" alt="stack frame"><br><img src="/2021/12/20/xv6-RSCI-V%E5%B8%B8%E7%94%A8%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4/2.jpg" alt="REGS"></p>
+          <h2 id="RISC-V-REGS"><a href="#RISC-V-REGS" class="headerlink" title="RISC-V REGS"></a>RISC-V REGS</h2><p><img src="/2021/12/20/xv6-RSCI-V%E5%B8%B8%E7%94%A8%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4/1.jpg" alt="stack frame"><br><img src="/2021/12/20/xv6-RSCI-V%E5%B8%B8%E7%94%A8%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4/2.jpg" alt="REGS"></p>
 <h2 id="INSTRACTIONS"><a href="#INSTRACTIONS" class="headerlink" title="INSTRACTIONS"></a>INSTRACTIONS</h2><p><img src="/2021/12/20/xv6-RSCI-V%E5%B8%B8%E7%94%A8%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4/3.jpg" alt="ins1"><br><img src="/2021/12/20/xv6-RSCI-V%E5%B8%B8%E7%94%A8%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4/4.jpg" alt="ins2"></p>
 
       
@@ -300,10 +309,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-12-20 09:36:51 / Modified: 16:41:23" itemprop="dateCreated datePublished" datetime="2021-12-20T09:36:51+08:00">2021-12-20</time>
+              <time title="Created: 2021-12-20 09:36:51" itemprop="dateCreated datePublished" datetime="2021-12-20T09:36:51+08:00">2021-12-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-01-04 22:47:41" itemprop="dateModified" datetime="2022-01-04T22:47:41+08:00">2022-01-04</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -325,8 +340,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><img src="/2021/12/20/ARM-LINUX%E4%B9%8B%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83-1/xiao.jpg" alt="zone"></p>
-<h2 id="LINUX-常用开发工具"><a href="#LINUX-常用开发工具" class="headerlink" title="LINUX 常用开发工具"></a>LINUX 常用开发工具</h2><h3 id="1-git安装配置"><a href="#1-git安装配置" class="headerlink" title="1.git安装配置"></a>1.git安装配置</h3><figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install git</span><br><span class="line">$ git config --global user.name <span class="string">&quot;xxx&quot;</span></span><br><span class="line">$ git config --global user.email <span class="string">&quot;xxx@email.com&quot;</span></span><br></pre></td></tr></table></figure>
+          <h2 id="LINUX-常用开发工具"><a href="#LINUX-常用开发工具" class="headerlink" title="LINUX 常用开发工具"></a>LINUX 常用开发工具</h2><h3 id="1-git安装配置"><a href="#1-git安装配置" class="headerlink" title="1.git安装配置"></a>1.git安装配置</h3><figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install git</span><br><span class="line">$ git config --global user.name <span class="string">&quot;xxx&quot;</span></span><br><span class="line">$ git config --global user.email <span class="string">&quot;xxx@email.com&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>xxx 替换成自己用户名和绑定邮箱</p>
 <h3 id="2-生成SSH秘钥"><a href="#2-生成SSH秘钥" class="headerlink" title="2.生成SSH秘钥"></a>2.生成SSH秘钥</h3><figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C <span class="string">&quot;xxx@email.com&quot;</span> </span><br><span class="line">$ cat  ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
@@ -491,7 +505,7 @@
         <span class="site-state-item-name">categories</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">tags</span>
       </div>
   </nav>
