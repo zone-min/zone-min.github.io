@@ -28,7 +28,7 @@
 <meta property="og:description" content="NOTICELINUX 驱动开发必须在搭载LINUCX系统或虚拟机上进行，WIN10自带WSL不支持。 本机开发环境搭建本机开发指宿主机和目标机是一台主机，即在本机上开发编译然后在本机 上加载运行（Linux设备驱动也可以直接编译进内核，但为了开发工作方便，一般采用动态加载的方式）step1:查看当前主机内核版本号 1uname -r step2: 查看当前宿主机所有源码版本 1apt-cache">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-01-04T06:23:15.000Z">
-<meta property="article:modified_time" content="2022-01-27T07:25:52.462Z">
+<meta property="article:modified_time" content="2022-01-27T09:15:11.290Z">
 <meta property="article:author" content="zone-min">
 <meta property="article:tag" content="DRIVER">
 <meta property="article:tag" content="LINUX-5.4.0">
@@ -182,7 +182,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-01-27 15:25:52" itemprop="dateModified" datetime="2022-01-27T15:25:52+08:00">2022-01-27</time>
+                <time title="Modified: 2022-01-27 17:15:11" itemprop="dateModified" datetime="2022-01-27T17:15:11+08:00">2022-01-27</time>
               </span>
 
           
@@ -210,7 +210,16 @@
 <p>step6: 安装 modules</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make modules_install</span><br></pre></td></tr></table></figure>
 
-
+<h2 id="嵌入式开发环境搭建"><a href="#嵌入式开发环境搭建" class="headerlink" title="嵌入式开发环境搭建"></a>嵌入式开发环境搭建</h2><p>这种开发中一般目标机为带有嵌入式处理器的开发板，而宿主机为PC，开发环境需要在宿主机上搭建，嵌入式Linux设备驱动开发的步骤如下(Cortex-A9架构的ARM开发板为例)：<br>step1:<br>在宿主机上下载嵌入式开发板对应版本Linux的源码，并解压：<a target="_blank" rel="noopener" href="https://www.kernel.org/">https://www.kernel.org/</a><br>tips：最好用开发板或核心板附带的源码包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># tar xvf linux-5.4.70.tar.gz</span><br></pre></td></tr></table></figure>
+<p>step2:编译内核</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># apt install gcc-arm-linux-gnueabi make libncurses-dev bison flex</span><br><span class="line"># cd linux-5.4.70</span><br><span class="line"># make ARCH=arm vexpress_defconfig</span><br><span class="line"># make ARCH=arm menuconfig</span><br><span class="line"># make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- uImage LOADADDR=0x60003000</span><br></pre></td></tr></table></figure>
+<p>step3:编译生成设备树</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- dtbs</span><br></pre></td></tr></table></figure>
+<p>step4: 在当前源码目录编译Modules</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- modules</span><br></pre></td></tr></table></figure>
+<p>step5: 安装 modules</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make modules_install</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -295,7 +304,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NOTICE"><span class="nav-number">1.</span> <span class="nav-text">NOTICE</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E6%9C%BA%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">本机开发环境搭建</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NOTICE"><span class="nav-number">1.</span> <span class="nav-text">NOTICE</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E6%9C%BA%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">本机开发环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.2.</span> <span class="nav-text">嵌入式开发环境搭建</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

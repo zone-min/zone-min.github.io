@@ -321,7 +321,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-01-27 15:25:52" itemprop="dateModified" datetime="2022-01-27T15:25:52+08:00">2022-01-27</time>
+                <time title="Modified: 2022-01-27 17:15:11" itemprop="dateModified" datetime="2022-01-27T17:15:11+08:00">2022-01-27</time>
               </span>
 
           
@@ -349,7 +349,16 @@
 <p>step6: 安装 modules</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make modules_install</span><br></pre></td></tr></table></figure>
 
-
+<h2 id="嵌入式开发环境搭建"><a href="#嵌入式开发环境搭建" class="headerlink" title="嵌入式开发环境搭建"></a>嵌入式开发环境搭建</h2><p>这种开发中一般目标机为带有嵌入式处理器的开发板，而宿主机为PC，开发环境需要在宿主机上搭建，嵌入式Linux设备驱动开发的步骤如下(Cortex-A9架构的ARM开发板为例)：<br>step1:<br>在宿主机上下载嵌入式开发板对应版本Linux的源码，并解压：<a target="_blank" rel="noopener" href="https://www.kernel.org/">https://www.kernel.org/</a><br>tips：最好用开发板或核心板附带的源码包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># tar xvf linux-5.4.70.tar.gz</span><br></pre></td></tr></table></figure>
+<p>step2:编译内核</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># apt install gcc-arm-linux-gnueabi make libncurses-dev bison flex</span><br><span class="line"># cd linux-5.4.70</span><br><span class="line"># make ARCH=arm vexpress_defconfig</span><br><span class="line"># make ARCH=arm menuconfig</span><br><span class="line"># make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- uImage LOADADDR=0x60003000</span><br></pre></td></tr></table></figure>
+<p>step3:编译生成设备树</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- dtbs</span><br></pre></td></tr></table></figure>
+<p>step4: 在当前源码目录编译Modules</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- modules</span><br></pre></td></tr></table></figure>
+<p>step5: 安装 modules</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make modules_install</span><br></pre></td></tr></table></figure>
 
       
     </div>
