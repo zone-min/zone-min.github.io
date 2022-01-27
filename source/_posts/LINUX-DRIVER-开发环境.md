@@ -12,5 +12,27 @@ step1:查看当前主机内核版本号
 ```
 uname -r
 ```
+step2: 查看当前宿主机所有源码版本
+```
+ apt-cache search linux-source
+```
+step3:根据宿主机内核版本号下载相应内核源码
+```
+sudo apt-get install linux-source-$(shell uname -r)
+```
+step4:配置内核,默认即可，也可采用原始配置单内存占用可能比较大
+```
+make menuconfig //图形配置
+
+make oldconfig //原始配置
+```
+step5: 编译Modules
+```
+make modules
+```
+step6: 安装 modules
+```
+make modules_install
+```
 
 
