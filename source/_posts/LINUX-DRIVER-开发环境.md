@@ -36,4 +36,31 @@ step6: 安装 modules
 make modules_install
 ```
 
-
+## 嵌入式开发环境搭建
+这种开发中一般目标机为带有嵌入式处理器的开发板，而宿主机为PC，开发环境需要在宿主机上搭建，嵌入式Linux设备驱动开发的步骤如下(Cortex-A9架构的ARM开发板为例)：
+step1:
+在宿主机上下载嵌入式开发板对应版本Linux的源码，并解压：https://www.kernel.org/
+tips：最好用开发板或核心板附带的源码包
+```
+# tar xvf linux-5.4.70.tar.gz
+```
+step2:编译内核
+```
+# apt install gcc-arm-linux-gnueabi make libncurses-dev bison flex
+# cd linux-5.4.70
+# make ARCH=arm vexpress_defconfig
+# make ARCH=arm menuconfig
+# make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- uImage LOADADDR=0x60003000
+```
+step3:编译生成设备树
+```
+# make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- dtbs
+```
+step4: 在当前源码目录编译Modules
+```
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- modules
+```
+step5: 安装 modules
+```
+make modules_install
+```
