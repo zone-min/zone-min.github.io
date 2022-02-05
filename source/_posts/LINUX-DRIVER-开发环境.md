@@ -2,7 +2,7 @@
 title: linux device driver 环境搭建指北
 date: 2022-01-04 14:23:15
 tags: [LINUX-5.4.0, DRIVER]
-cateories: LINUX
+categories: LINUX
 ---
 # NOTICE 
 LINUX 驱动开发必须在搭载LINUCX系统或虚拟机上进行，WIN10自带WSL不支持。

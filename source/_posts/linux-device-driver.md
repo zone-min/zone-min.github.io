@@ -2,7 +2,7 @@
 title: linux device driver
 date: 2022-01-04 14:23:15
 tags: [LINUX-5.04.70, DRIVER]
-cateories: LINUX
+categories: LINUX
 ---
 
 ## 概念
@@ -54,5 +54,26 @@ endif
 指定架构及编译选项（可修改Makefile, 之后补充）
 ```shell
 make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
-````
+```
 ## LINUX 驱动开发之SCULL
+scull（simple character utility for loading localities，区域装载的简单字符工具）是一个操作内存区域的字符设备驱动程序，该字符设备并不是一个真实的物理设备，而是使用内存来模拟一个字符设备
+设备模型:
+
+![1](scull.png)
+
+源码参照: http://examples.oreilly.com/9780596005900/
+
+由于ldd3书本是基于linuxn内核2.6，因此其大多驱动示例已经不能在最新版本内核编译。若想在最新版本内核编译驱动程序，可参照：
+
+The example drivers should compile against latest Linus Torvalds kernel tree:
+```
+* git://git.kernel.org/pub/scm/linux/kernel/git/sfr/linux-next.git
+```
+To compile the drivers against a specific tree (for example Linus tree):
+```
+$ git clone git://github.com/martinezjavier/ldd3.git
+$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+$ export KERNELDIR=/path/to/linux
+$ cd ldd3
+$ make
+```

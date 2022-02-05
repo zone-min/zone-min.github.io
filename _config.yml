@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: ZONE-MIN个人博客
+title: ZONE-MINの个人博客
 subtitle: ''
 description: '嵌入式技术栈'
 keywords:
@@ -110,9 +110,17 @@ busuanzi_count:
   post_views: true   #统计文章阅读数
   post_views_icon: eye
 
+#2.站内搜索
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
+
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  branch: hexo
+  branch: source
   repo: git@github.com:zone-min/zone-min.github.io.git
